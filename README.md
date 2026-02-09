@@ -1,6 +1,6 @@
-# Mini Social Feed App (Backend)
+# EasyPost Backend
 
-Lightweight Node.js + Express backend for a mini social feed. Provides JWT auth and APIs for posts, likes, and comments. Designed to support mobile clients.
+Lightweight Node.js + Express backend for EasyPost, a mini social feed app. Provides JWT auth and APIs for posts, likes, and comments. Designed to support mobile clients.
 
 ## Features
 
@@ -30,7 +30,7 @@ Create a `.env` file in the project root:
 
 ```bash
 PORT=5050
-MONGO_URI=mongodb://localhost:27017/mini_social_feed
+MONGO_URI=mongodb://localhost:27017/easypost
 JWT_SECRET=replace_with_strong_secret
 ```
 
@@ -66,14 +66,18 @@ Base URL: `http://localhost:<PORT>`
 - `GET /api/users/me` - Get current user
 - `PATCH /api/users/me` - Update current user
 
-## Planned APIs (for the full task)
+### Posts
 
-The following endpoints are expected for the complete assignment scope. They can be added as the project grows:
+- `POST /api/posts` - Create a post
+- `GET /api/posts` - Get all posts (paginated, newest first)
 
-- `POST /posts` - Create a post
-- `GET /posts` - Get all posts (paginated, newest first)
-- `POST /posts/:id/like` - Like or unlike a post
-- `POST /posts/:id/comment` - Add a comment
+### Likes
+
+- `POST /api/posts/:id/like` - Like or unlike a post
+
+### Comments
+
+- `POST /api/posts/:id/comment` - Add a comment
 
 ## Notifications (FCM)
 
@@ -94,9 +98,41 @@ FCM is intended for notifying users when their posts receive likes or comments. 
 ```
 src/
 	config/
+		db.ts
 	middleware/
+		auth.ts
+		checkLogin.ts
+		errorHandler.ts
 	models/
+		Comment.ts
+		Like.ts
+		Post.ts
+		User.ts
 	modules/
+		auth/
+			auth.controller.ts
+			auth.router.ts
+			auth.validator.ts
+		comment/
+			comment.controller.ts
+			comment.router.ts
+			comment.validator.ts
+		like/
+			like.controller.ts
+			like.router.ts
+			like.validator.ts
+		post/
+			post.controller.ts
+			post.router.ts
+			post.validator.ts
+		user/
+			user.controller.ts
+			user.router.ts
+			user.validator.ts
 	router/
+		router.ts
 	utils/
+		counterUtils.ts
+		jwt.ts
+	index.ts
 ```

@@ -43,10 +43,6 @@ export const loginController = async (req: Request, res: Response) => {
   const match = await bcrypt.compare(password, user.password!);
   if (!match) return res.status(400).json({ message: "Invalid credentials" });
 
-  // update lastLoginAt
-  user.lastLoginAt = new Date();
-  await user.save();
-
   if (!process.env.JWT_SECRET) {
     return res.status(500).json({ message: "JWT secret not configured" });
   }
@@ -56,7 +52,9 @@ export const loginController = async (req: Request, res: Response) => {
     process.env.JWT_SECRET,
     { expiresIn: "1h" },
   );
+
   const userObj = user.toObject();
-  delete userObj.password;
-  res.json({ token, user: userObj });
+  const { password: _, ...userWithoutPassword } = userObj;
+
+  res.json({ token, user: userWithoutPassword });
 };
