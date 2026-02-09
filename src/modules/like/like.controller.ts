@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../../middleware/checkLogin";
 import Like from "../../models/Like";
 import Post from "../../models/Post";
+import { decrementPostCounter } from "../../utils/counterUtils";
 
 export const toggleLike = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
@@ -13,11 +14,19 @@ export const toggleLike = async (req: AuthRequest, res: Response) => {
   const existing = await Like.findOne({ userId, postId: post._id });
 
   if (existing) {
-    await Like.findByIdAndDelete(existing._id);
+    // Unlike: decrement count safely
+    await Promise.all([
+      Like.findByIdAndDelete(existing._id),
+      decrementPostCounter(post._id, "likesCount", 1),
+    ]);
     return res.json({ message: "Post unliked", liked: false });
   }
 
-  await Like.create({ userId, postId: post._id });
+  // Like: increment count
+  await Promise.all([
+    Like.create({ userId, postId: post._id }),
+    Post.findByIdAndUpdate(post._id, { $inc: { likesCount: 1 } }, { new: true }),
+  ]);
   res.json({ message: "Post liked", liked: true });
 };
 

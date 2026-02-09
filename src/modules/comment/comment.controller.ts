@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../../middleware/checkLogin";
 import Comment from "../../models/Comment";
 import Post from "../../models/Post";
+import { decrementPostCounter } from "../../utils/counterUtils";
 
 export const createComment = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
@@ -15,6 +16,13 @@ export const createComment = async (req: AuthRequest, res: Response) => {
     postId: post._id,
     content: req.body.content,
   });
+
+  // Increment comment count atomically
+  await Post.findByIdAndUpdate(
+    post._id,
+    { $inc: { commentsCount: 1 } },
+    { new: true },
+  );
 
   res.status(201).json({ message: "Comment added", comment });
 };
@@ -41,6 +49,11 @@ export const deleteComment = async (req: AuthRequest, res: Response) => {
       .status(403)
       .json({ message: "You can only delete your own comments" });
 
-  await Comment.findByIdAndDelete(comment._id);
+  // Decrement comment count safely (prevents going negative)
+  await Promise.all([
+    Comment.findByIdAndDelete(comment._id),
+    decrementPostCounter(comment.postId, "commentsCount", 1),
+  ]);
+
   res.json({ message: "Comment deleted" });
 };
