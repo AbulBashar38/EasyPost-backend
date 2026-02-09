@@ -4,14 +4,7 @@ import jwt from "jsonwebtoken";
 import User from "../../models/User";
 
 export const registerUserController = async (req: Request, res: Response) => {
-  const {
-    email,
-    password,
-    firstName,
-    lastName,
-    onboardingStage,
-    currentBusinessPlanId,
-  } = req.body;
+  const { email, password, firstName, lastName } = req.body;
 
   const existing = await User.findOne({ email });
   if (existing)
@@ -19,12 +12,14 @@ export const registerUserController = async (req: Request, res: Response) => {
 
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
+  const username = `${firstName}${lastName}`.replace(/\s+/g, "").toLowerCase();
 
   const user = await User.create({
     email,
     password: hashed,
     firstName,
     lastName,
+    username,
   });
 
   if (!process.env.JWT_SECRET) {
