@@ -1,5 +1,5 @@
-import Post from "../models/Post";
 import { Types } from "mongoose";
+import Post from "../models/Post";
 
 /**
  * Safely increment a post counter by a value

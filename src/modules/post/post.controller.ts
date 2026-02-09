@@ -56,6 +56,30 @@ export const getAllPosts = async (req: AuthRequest, res: Response) => {
   res.json({ posts: postsWithDetails, total, page, limit });
 };
 
+export const getMyPosts = async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const skip = (page - 1) * limit;
+
+  const [posts, total] = await Promise.all([
+    Post.find({ userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("userId", "firstName lastName username profilePicture"),
+    Post.countDocuments({ userId }),
+  ]);
+
+  const postsWithDetails = await Promise.all(
+    posts.map((post) => buildPostResponse(post, userId)),
+  );
+
+  res.json({ posts: postsWithDetails, total, page, limit });
+};
+
 export const getPostById = async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ message: "Unauthorized" });

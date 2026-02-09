@@ -1,14 +1,17 @@
 # EasyPost API Documentation
 
 ## Base URL
+
 ```
 http://localhost:5050/api
 ```
 
 ## Authentication
+
 All endpoints except `/auth/register` and `/auth/login` require authentication.
 
 **Header:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
@@ -18,9 +21,11 @@ Authorization: Bearer <JWT_TOKEN>
 ## Authentication Endpoints
 
 ### Register User
+
 **Endpoint:** `POST /auth/register`
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -31,6 +36,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response (201):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -40,9 +46,11 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### Login User
+
 **Endpoint:** `POST /auth/login`
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -51,6 +59,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response (200):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -73,14 +82,17 @@ Authorization: Bearer <JWT_TOKEN>
 ## User Endpoints
 
 ### Get Current User Profile
+
 **Endpoint:** `GET /users/me`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "User info",
@@ -101,14 +113,17 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### Update Current User Profile
+
 **Endpoint:** `PATCH /users/me`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Request Body:**
+
 ```json
 {
   "firstName": "Jonathan",
@@ -117,6 +132,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "User updated",
@@ -139,15 +155,18 @@ Authorization: Bearer <JWT_TOKEN>
 ## Post Endpoints
 
 ### Create a Post
+
 **Endpoint:** `POST /posts`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "content": "This is my first post on EasyPost!"
@@ -155,6 +174,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "message": "Post created",
@@ -169,6 +189,7 @@ Content-Type: application/json
 ```
 
 **Status Codes:**
+
 - `201` - Post created successfully
 - `400` - Validation error (missing content)
 - `401` - Unauthorized (no token)
@@ -176,20 +197,24 @@ Content-Type: application/json
 ---
 
 ### Get All Posts
+
 **Endpoint:** `GET /posts`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Query Parameters:**
+
 - `page` (optional, default: 1) - Page number for pagination
 - `limit` (optional, default: 10) - Number of posts per page
 
 **Example:** `GET /posts?page=1&limit=10`
 
 **Response (200):**
+
 ```json
 {
   "posts": [
@@ -233,23 +258,98 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
+- `200` - Successfully retrieved posts
+- `401` - Unauthorized
+
+---
+
+### Get My Posts (Logged-in User)
+
+**Endpoint:** `GET /posts/mine`
+
+**Headers:**
+
+```
+Authorization: Bearer <JWT_TOKEN>
+```
+
+**Query Parameters:**
+
+- `page` (optional, default: 1) - Page number for pagination
+- `limit` (optional, default: 10) - Number of posts per page
+
+**Example:** `GET /posts/mine?page=1&limit=10`
+
+**Response (200):**
+
+Returns the same format as "Get All Posts" but only the current user's posts.
+
+```json
+{
+  "posts": [
+    {
+      "_id": "507f1f77bcf86cd799439012",
+      "userId": {
+        "_id": "507f1f77bcf86cd799439011",
+        "firstName": "John",
+        "lastName": "Doe",
+        "username": "johndoe",
+        "profilePicture": "https://example.com/pic.jpg"
+      },
+      "content": "This is my first post on EasyPost!",
+      "likesCount": 5,
+      "commentsCount": 2,
+      "isLiked": true,
+      "comments": [
+        {
+          "_id": "507f1f77bcf86cd799439013",
+          "userId": {
+            "_id": "507f1f77bcf86cd799439015",
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "username": "janesmith",
+            "profilePicture": "https://example.com/pic2.jpg"
+          },
+          "postId": "507f1f77bcf86cd799439012",
+          "content": "Great post!",
+          "createdAt": "2025-02-09T10:50:00Z",
+          "updatedAt": "2025-02-09T10:50:00Z"
+        }
+      ],
+      "createdAt": "2025-02-09T10:40:00Z",
+      "updatedAt": "2025-02-09T10:40:00Z"
+    }
+  ],
+  "total": 5,
+  "page": 1,
+  "limit": 10
+}
+```
+
+**Status Codes:**
+
 - `200` - Successfully retrieved posts
 - `401` - Unauthorized
 
 ---
 
 ### Get Single Post
+
 **Endpoint:** `GET /posts/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post
 
 **Response (200):**
+
 ```json
 {
   "post": {
@@ -288,6 +388,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Successfully retrieved post
 - `400` - Invalid post ID
 - `401` - Unauthorized
@@ -296,18 +397,22 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### Update Post
+
 **Endpoint:** `PATCH /posts/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post
 
 **Request Body:**
+
 ```json
 {
   "content": "Updated post content!"
@@ -315,6 +420,7 @@ Content-Type: application/json
 ```
 
 **Response (200):**
+
 ```json
 {
   "message": "Post updated",
@@ -329,6 +435,7 @@ Content-Type: application/json
 ```
 
 **Status Codes:**
+
 - `200` - Post updated successfully
 - `400` - Validation error
 - `401` - Unauthorized
@@ -338,17 +445,21 @@ Content-Type: application/json
 ---
 
 ### Delete Post
+
 **Endpoint:** `DELETE /posts/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post
 
 **Response (200):**
+
 ```json
 {
   "message": "Post deleted"
@@ -356,6 +467,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Post deleted successfully
 - `400` - Invalid post ID
 - `401` - Unauthorized
@@ -367,18 +479,22 @@ Authorization: Bearer <JWT_TOKEN>
 ## Comment Endpoints
 
 ### Create a Comment
+
 **Endpoint:** `POST /comments/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post to comment on
 
 **Request Body:**
+
 ```json
 {
   "content": "Great post! I totally agree."
@@ -386,6 +502,7 @@ Content-Type: application/json
 ```
 
 **Response (201):**
+
 ```json
 {
   "message": "Comment added",
@@ -401,6 +518,7 @@ Content-Type: application/json
 ```
 
 **Status Codes:**
+
 - `201` - Comment created successfully
 - `400` - Validation error (invalid postId or missing content)
 - `401` - Unauthorized
@@ -409,17 +527,21 @@ Content-Type: application/json
 ---
 
 ### Get Comments for a Post
+
 **Endpoint:** `GET /comments/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post
 
 **Response (200):**
+
 ```json
 {
   "comments": [
@@ -442,6 +564,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Successfully retrieved comments
 - `400` - Invalid post ID
 - `401` - Unauthorized
@@ -450,17 +573,21 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### Delete Comment
+
 **Endpoint:** `DELETE /comments/:commentId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `commentId` (required) - MongoDB ObjectId of the comment
 
 **Response (200):**
+
 ```json
 {
   "message": "Comment deleted"
@@ -468,6 +595,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Comment deleted successfully
 - `401` - Unauthorized
 - `403` - Forbidden (not your comment)
@@ -478,19 +606,23 @@ Authorization: Bearer <JWT_TOKEN>
 ## Like Endpoints
 
 ### Toggle Like on a Post
+
 **Endpoint:** `POST /likes/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post to like
 
 **Request Body:** (empty)
 
 **Response (200) - Like Added:**
+
 ```json
 {
   "message": "Post liked",
@@ -499,6 +631,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Response (200) - Like Removed:**
+
 ```json
 {
   "message": "Post unliked",
@@ -507,6 +640,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Like toggled successfully
 - `400` - Invalid post ID
 - `401` - Unauthorized
@@ -515,17 +649,21 @@ Authorization: Bearer <JWT_TOKEN>
 ---
 
 ### Get Likes for a Post
+
 **Endpoint:** `GET /likes/:postId`
 
 **Headers:**
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 ```
 
 **URL Parameters:**
+
 - `postId` (required) - MongoDB ObjectId of the post
 
 **Response (200):**
+
 ```json
 {
   "likes": [
@@ -547,6 +685,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Status Codes:**
+
 - `200` - Successfully retrieved likes
 - `400` - Invalid post ID
 - `401` - Unauthorized
@@ -557,6 +696,7 @@ Authorization: Bearer <JWT_TOKEN>
 ## Error Responses
 
 ### Validation Error (400)
+
 ```json
 {
   "message": "Validation Failed!!!",
@@ -574,6 +714,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### Unauthorized (401)
+
 ```json
 {
   "message": "Authorization failed",
@@ -583,6 +724,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### Forbidden (403)
+
 ```json
 {
   "message": "You can only update your own posts",
@@ -592,6 +734,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### Not Found (404)
+
 ```json
 {
   "message": "Post not found",
@@ -601,6 +744,7 @@ Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### Server Error (500)
+
 ```json
 {
   "message": "Internal Server Error",
@@ -614,6 +758,7 @@ Authorization: Bearer <JWT_TOKEN>
 ## Testing with cURL
 
 ### Register
+
 ```bash
 curl -X POST http://localhost:5050/api/auth/register \
   -H "Content-Type: application/json" \
@@ -626,6 +771,7 @@ curl -X POST http://localhost:5050/api/auth/register \
 ```
 
 ### Create Post
+
 ```bash
 curl -X POST http://localhost:5050/api/posts \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -636,12 +782,21 @@ curl -X POST http://localhost:5050/api/posts \
 ```
 
 ### Get All Posts
+
 ```bash
 curl -X GET "http://localhost:5050/api/posts?page=1&limit=10" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
+### Get My Posts
+
+```bash
+curl -X GET "http://localhost:5050/api/posts/mine?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
 ### Add Comment
+
 ```bash
 curl -X POST http://localhost:5050/api/comments/POST_ID \
   -H "Authorization: Bearer YOUR_TOKEN" \
@@ -652,12 +807,14 @@ curl -X POST http://localhost:5050/api/comments/POST_ID \
 ```
 
 ### Like Post
+
 ```bash
 curl -X POST http://localhost:5050/api/likes/POST_ID \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
 ### Get Likes
+
 ```bash
 curl -X GET http://localhost:5050/api/likes/POST_ID \
   -H "Authorization: Bearer YOUR_TOKEN"

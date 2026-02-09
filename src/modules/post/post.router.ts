@@ -8,6 +8,7 @@ import {
   createPost,
   deletePost,
   getAllPosts,
+  getMyPosts,
   getPostById,
   updatePost,
 } from "./post.controller";
@@ -28,6 +29,8 @@ router.post(
 );
 
 router.get("/", checkUserLogin, withErrorHandling(getAllPosts));
+
+router.get("/mine", checkUserLogin, withErrorHandling(getMyPosts));
 
 router.get(
   "/:postId",
