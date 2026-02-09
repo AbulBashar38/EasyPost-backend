@@ -5,20 +5,34 @@ export interface IUser extends Document {
   lastName: string;
   username: string;
   email: string;
-  password?: string;
-  lastLoginAt?: Date | null;
+  password: string;
+  bio?: string;
+  profilePicture?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const UserSchema = new Schema<IUser>(
   {
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    username: { type: String, required: true },
-    email: { type: String, required: true, unique: true, index: true },
+    firstName: { type: String, required: true, trim: true },
+    lastName: { type: String, required: true, trim: true },
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     password: { type: String, required: true },
-    lastLoginAt: { type: Date, default: null },
+    bio: { type: String, maxlength: 160, trim: true },
+    profilePicture: { type: String, trim: true },
   },
   { timestamps: true },
 );
